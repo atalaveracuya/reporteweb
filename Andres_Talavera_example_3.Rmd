@@ -1,0 +1,109 @@
+---
+title: "Estudio descriptivo de la duración de películas de Amazon Prime Titles"
+author: "Reportes con R"
+date: "25/2/2023"
+output: 
+  html_document:
+    toc: yes
+    toc_float:
+      collapse: yes
+    number_sections: yes
+    code_folding: hide
+    code_download: yes
+    theme: spacelab
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Cargar los datos de mi dataset 
+URL: [AmazonPrimeTitles](https://raw.githubusercontent.com/atalaveracuya/amazon_prime_titles/main/amazon_prime_titles.csv)
+
+
+``` {r cargalibrerias, eval=TRUE, message = FALSE}
+
+library(tidyverse)
+library(ggplot2)
+library(corrplot)
+library(car)
+library(knitr)
+library(PerformanceAnalytics)
+library(cowplot)
+
+
+amazon <- read.csv("https://raw.githubusercontent.com/atalaveracuya/amazon_prime_titles/main/amazon_prime_titles.csv")
+
+library(stringi)
+amazon$duration2 <- as.numeric(stri_extract_last(amazon$duration,regex="\\d+"))
+
+amazon <- amazon[,c("type", "title", "rating", "duration2", "release_year")]
+
+amazon <- amazon %>% rename_at('type', ~'Tipo')
+amazon <- amazon %>% rename_at('title', ~'Título')
+amazon <- amazon %>% rename_at('rating', ~'Rating')
+amazon <- amazon %>% rename_at('duration2', ~'Duracion')
+amazon <- amazon %>% rename_at('release_year', ~'Año')
+
+movie <- amazon %>% filter(Tipo == 'Movie')
+tvshow  <- amazon %>% filter(Tipo == 'TV Show')
+``` 
+
+# Nombres de las columnas 
+Para empezar con un estudio descriptivo de nuestro dataset, empezamos sabiendo conociendo los nombres de las variables. 
+
+```{r}
+colnames(movie)
+```
+
+# Estructura del dataframe 
+Usaremos la función `str`. 
+
+```{r}
+str(movie)
+```
+
+# Variable cuantitativa: Duración
+
+Veamos un análisis univariado
+
+
+## Un resumen descriptivo
+```{r}
+summary(movie)
+
+```
+
+Nos quedamos con peliculas que tienen tiempo mayor a cero. 
+
+```{r}
+movie <- movie %>% filter(Duracion>0)
+summary(movie)
+```
+
+
+- Boxplot 
+
+```{r}
+boxplot(movie$Duracion,
+        main = "Duración de películas de Amazon Prime Titles")
+```
+
+
+- Histrograma 
+
+```{r}
+hist(movie$Duracion,
+        main = "Duración de películas de Amazon Prime Titles")
+```
+
+- Ejemplo usando ggplot:  duración vs año 
+
+```{r}
+
+ggplot2::ggplot(data = movie, mapping = aes(x =Año,
+                                            y = Duracion)
+                
+                        ) + 
+  geom_point() 
+```
