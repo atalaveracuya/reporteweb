@@ -30,7 +30,7 @@ library(car)
 library(knitr)
 library(PerformanceAnalytics)
 library(cowplot)
-
+library(highcharter) 
 
 amazon <- read.csv("https://raw.githubusercontent.com/atalaveracuya/amazon_prime_titles/main/amazon_prime_titles.csv")
 
@@ -107,3 +107,14 @@ ggplot2::ggplot(data = movie, mapping = aes(x =Año,
                         ) + 
   geom_point() 
 ```
+
+
+- Ejemplo usando highcharter
+
+```{r}
+
+hc <- movie %>% hchart('scatter', hcaes(x = Año, y = Duracion, color = Duracion) )
+hc
+
+```
+
